@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+  <html lang="ko">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Smartphone RAG Analyst</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+      <div class="container">
+          <h1> Smartphone RAG Analyst</h1>
+          <div class="search-box">
+              <input type="text" id="deviceInput" placeholder="Enter device name (e.g. iPhone 16 Pro)">
+              <button onclick="analyzeDevice()">Analyze</button>
+          </div>
+          <div id="loading" class="hidden">Analyzing... Please wait.</div>
+          <div id="result" class="result-container"></div>
+      </div>
+
+      <script>
+          async function analyzeDevice() {
+            const device = document.getElementById('deviceInput').value;
+            if (!device) return alert('Please enter a device name');
+
+            document.getElementById('loading').classList.remove('hidden');
+              document.getElementById('result').innerHTML = '';
+
+            try {
+                const response = await fetch('/analyze', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ device })
+                  });
+                const data = await response.json();
+
+                if (data.report) {
+                    document.getElementById('result').innerHTML = data.report;
+} else {
+                    document.getElementById('result').innerHTML = `<p class="error">${data.error || 'Unknown error'}</p>`;
+}
+} catch (err) {
+                document.getElementById('result').innerHTML = `<p class="error">Error: ${err.message}</p>`;
+} finally {
+                document.getElementById('loading').classList.add('hidden');
+}
+}
+    </script>
+</body>
+</html>
